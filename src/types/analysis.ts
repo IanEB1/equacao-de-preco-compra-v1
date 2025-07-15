@@ -11,22 +11,23 @@ export interface AnalysisData {
   lpa: number;
   vpa: number;
   cagr: number;
-  dividends: number[];
-  results: CalculationResults;
-  createdAt: Date;
-  userId?: string;
-  folderId?: string;
+  dividend_year_1: number;
+  dividend_year_2: number;
+  dividend_year_3: number;
+  graham_formula_1: number;
+  graham_formula_2: number;
+  bazin_formula: number;
+  final_price: number;
+  created_at: string;
+  updated_at?: string;
+  user_id?: string;
+  folder_id?: string;
 }
 
 export interface AnalysisFolder {
   id?: string;
   name: string;
-  userId?: string;
-  createdAt: Date;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
+  user_id?: string;
+  created_at: string;
+  updated_at?: string;
 }

@@ -6,6 +6,7 @@ const Navigation = () => {
   const location = useLocation();
   const {
     user,
+    profile,
     logout,
     isAuthenticated
   } = useAuth();
@@ -39,7 +40,7 @@ const Navigation = () => {
             {isAuthenticated ? <div className="flex items-center space-x-4">
                 <div className="hidden md:flex items-center space-x-2">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{user?.name || user?.email}</span>
+                  <span className="text-sm text-muted-foreground">{profile?.name || user?.email}</span>
                 </div>
                 <Button variant="outline" size="sm" onClick={logout} className="flex items-center gap-2">
                   <LogOut className="h-4 w-4" />

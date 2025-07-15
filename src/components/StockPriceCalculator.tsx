@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { AnalysisData } from "@/types/analysis";
+import { useAnalyses } from "@/hooks/useAnalyses";
 import { Calculator, TrendingUp, DollarSign } from "lucide-react";
 
 interface CalculationResults {
@@ -27,12 +28,9 @@ const StockPriceCalculator = () => {
   const [d3, setD3] = useState("");
   const [results, setResults] = useState<CalculationResults | null>(null);
   const navigate = useNavigate();
-  const {
-    isAuthenticated
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const { saveAnalysis: saveToDatabase } = useAnalyses();
 
   const calculatePrice = () => {
     const lpaNum = parseFloat(lpa);
@@ -76,7 +74,7 @@ const StockPriceCalculator = () => {
     setResults(null);
   };
 
-  const saveAnalysis = () => {
+  const saveAnalysis = async () => {
     if (!results || !ticker.trim()) {
       toast({
         title: "Análise não encontrada",
@@ -102,22 +100,35 @@ const StockPriceCalculator = () => {
       return;
     }
 
-    const analysisData: AnalysisData = {
+    const analysisData = {
       ticker: ticker.toUpperCase(),
       lpa: lpaNum,
       vpa: vpaNum,
       cagr: parseFloat(cagr) || 0,
-      dividends: [d1Num, d2Num, d3Num],
-      results,
-      createdAt: new Date()
+      dividend_year_1: d1Num,
+      dividend_year_2: d2Num,
+      dividend_year_3: d3Num,
+      graham_formula_1: results.graham,
+      graham_formula_2: results.proj,
+      bazin_formula: results.bazin,
+      final_price: results.finalPrice,
+      folder_id: undefined
     };
 
-    // Simular salvamento - será substituído por Supabase
-    console.log('Salvando análise:', analysisData);
-    toast({
-      title: "Análise salva com sucesso!",
-      description: `A análise de ${ticker.toUpperCase()} foi salva.`
-    });
+    try {
+      await saveToDatabase(analysisData);
+      toast({
+        title: "Análise salva com sucesso!",
+        description: `A análise de ${ticker.toUpperCase()} foi salva.`
+      });
+    } catch (error) {
+      console.error('Erro ao salvar análise:', error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Ocorreu um erro ao salvar a análise. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   return <div className="min-h-screen bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] px-4 py-8">

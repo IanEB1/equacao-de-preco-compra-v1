@@ -14,7 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analysis_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_folders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stock_analyses: {
+        Row: {
+          bazin_formula: number
+          cagr: number
+          created_at: string
+          dividend_year_1: number
+          dividend_year_2: number
+          dividend_year_3: number
+          final_price: number
+          folder_id: string | null
+          graham_formula_1: number
+          graham_formula_2: number
+          id: string
+          lpa: number
+          ticker: string
+          updated_at: string | null
+          user_id: string
+          vpa: number
+        }
+        Insert: {
+          bazin_formula: number
+          cagr: number
+          created_at?: string
+          dividend_year_1: number
+          dividend_year_2: number
+          dividend_year_3: number
+          final_price: number
+          folder_id?: string | null
+          graham_formula_1: number
+          graham_formula_2: number
+          id?: string
+          lpa: number
+          ticker: string
+          updated_at?: string | null
+          user_id: string
+          vpa: number
+        }
+        Update: {
+          bazin_formula?: number
+          cagr?: number
+          created_at?: string
+          dividend_year_1?: number
+          dividend_year_2?: number
+          dividend_year_3?: number
+          final_price?: number
+          folder_id?: string | null
+          graham_formula_1?: number
+          graham_formula_2?: number
+          id?: string
+          lpa?: number
+          ticker?: string
+          updated_at?: string | null
+          user_id?: string
+          vpa?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_analyses_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_analyses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
