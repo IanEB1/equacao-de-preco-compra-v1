@@ -59,7 +59,7 @@ export const useAnalyses = () => {
 
     if (error) {
       console.error('Error creating folder:', error);
-      throw new Error(error.message);
+      throw new Error('Falha ao criar pasta');
     }
 
     await fetchFolders();
@@ -77,7 +77,7 @@ export const useAnalyses = () => {
 
     if (error) {
       console.error('Error deleting folder:', error);
-      throw new Error(error.message);
+      throw new Error('Falha ao excluir pasta');
     }
 
     await fetchFolders();
@@ -100,7 +100,7 @@ export const useAnalyses = () => {
 
     if (error) {
       console.error('Error saving analysis:', error);
-      throw new Error(error.message);
+      throw new Error('Falha ao salvar análise');
     }
 
     await fetchAnalyses();
@@ -118,7 +118,7 @@ export const useAnalyses = () => {
 
     if (error) {
       console.error('Error deleting analysis:', error);
-      throw new Error(error.message);
+      throw new Error('Falha ao excluir análise');
     }
 
     await fetchAnalyses();

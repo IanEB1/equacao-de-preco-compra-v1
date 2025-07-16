@@ -20,6 +20,11 @@ interface CalculationResults {
 
 const StockPriceCalculator = () => {
   const [ticker, setTicker] = useState("");
+  
+  // Input validation functions
+  const validateTicker = (value: string) => {
+    return value.replace(/[^A-Za-z0-9]/g, '').slice(0, 10);
+  };
   const [lpa, setLpa] = useState("");
   const [vpa, setVpa] = useState("");
   const [cagr, setCagr] = useState("");
@@ -172,7 +177,7 @@ const StockPriceCalculator = () => {
               <Label htmlFor="ticker" className="text-white font-medium">
                 Ticker da Ação
               </Label>
-              <Input id="ticker" type="text" placeholder="Ex: PETR4" value={ticker} onChange={e => setTicker(e.target.value.toUpperCase())} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" maxLength={10} />
+              <Input id="ticker" type="text" placeholder="Ex: PETR4" value={ticker} onChange={e => setTicker(validateTicker(e.target.value.toUpperCase()))} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" maxLength={10} />
             </div>
 
             {/* LPA */}

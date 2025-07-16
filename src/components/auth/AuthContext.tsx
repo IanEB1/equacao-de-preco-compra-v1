@@ -94,7 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     if (error) {
-      throw new Error(error.message);
+      // Generic error for security - don't expose specific auth details
+      throw new Error('Authentication failed');
     }
   };
 
@@ -113,7 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     if (error) {
-      throw new Error(error.message);
+      // Generic error for security - don't expose specific auth details
+      throw new Error('Registration failed');
     }
   };
 

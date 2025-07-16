@@ -15,6 +15,15 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({ email: '', password: '', name: '' });
+  
+  // Input validation functions
+  const validatePassword = (password: string) => {
+    return password.length >= 6;
+  };
+  
+  const sanitizeName = (name: string) => {
+    return name.replace(/[<>'"&]/g, '').slice(0, 50);
+  };
   const { login, register } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -31,9 +40,10 @@ const LoginForm = () => {
       });
       navigate('/data-entry-choice');
     } catch (error) {
+      // Generic error message for security
       toast({
-        title: "Erro no login",
-        description: "Verifique suas credenciais e tente novamente.",
+        title: "Erro de autenticação",
+        description: "Credenciais inválidas. Verifique seus dados e tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -45,17 +55,30 @@ const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Validate password strength
+    if (!validatePassword(registerForm.password)) {
+      toast({
+        title: "Senha muito fraca",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
+    
     try {
-      await register(registerForm.email, registerForm.password, registerForm.name);
+      const sanitizedName = registerForm.name ? sanitizeName(registerForm.name) : '';
+      await register(registerForm.email, registerForm.password, sanitizedName);
       toast({
         title: "Conta criada com sucesso!",
         description: "Sua conta foi criada e você está logado."
       });
       navigate('/data-entry-choice');
     } catch (error) {
+      // Generic error message for security
       toast({
-        title: "Erro no registro",
-        description: "Não foi possível criar sua conta. Tente novamente.",
+        title: "Erro de registro",
+        description: "Não foi possível criar sua conta. Verifique os dados e tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -152,7 +175,8 @@ const LoginForm = () => {
                       type="text"
                       placeholder="Seu nome"
                       value={registerForm.name}
-                      onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                      onChange={(e) => setRegisterForm({ ...registerForm, name: sanitizeName(e.target.value) })}
+                      maxLength={50}
                     />
                   </div>
                   <div className="space-y-2">
@@ -175,6 +199,7 @@ const LoginForm = () => {
                       value={registerForm.password}
                       onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
                       required
+                      minLength={6}
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
