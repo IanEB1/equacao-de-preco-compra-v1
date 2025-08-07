@@ -124,6 +124,40 @@ export const useAnalyses = () => {
     await fetchAnalyses();
   };
 
+  const updateAnalysisNotes = async (analysisId: string, notes: string) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('stock_analyses')
+      .update({ notes })
+      .eq('id', analysisId)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error updating notes:', error);
+      throw new Error('Falha ao atualizar anotações');
+    }
+
+    await fetchAnalyses();
+  };
+
+  const moveAnalysisToFolder = async (analysisId: string, folderId: string | null) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('stock_analyses')
+      .update({ folder_id: folderId })
+      .eq('id', analysisId)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Error moving analysis:', error);
+      throw new Error('Falha ao mover análise');
+    }
+
+    await fetchAnalyses();
+  };
+
   useEffect(() => {
     if (user) {
       Promise.all([fetchFolders(), fetchAnalyses()]).finally(() => {
@@ -144,6 +178,8 @@ export const useAnalyses = () => {
     deleteFolder,
     saveAnalysis,
     deleteAnalysis,
+    updateAnalysisNotes,
+    moveAnalysisToFolder,
     refreshData: () => Promise.all([fetchFolders(), fetchAnalyses()]),
   };
 };

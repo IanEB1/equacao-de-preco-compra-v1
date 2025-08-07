@@ -84,6 +84,7 @@ export type Database = {
           graham_formula_2: number
           id: string
           lpa: number
+          notes: string | null
           ticker: string
           updated_at: string | null
           user_id: string
@@ -102,6 +103,7 @@ export type Database = {
           graham_formula_2: number
           id?: string
           lpa: number
+          notes?: string | null
           ticker: string
           updated_at?: string | null
           user_id: string
@@ -120,6 +122,7 @@ export type Database = {
           graham_formula_2?: number
           id?: string
           lpa?: number
+          notes?: string | null
           ticker?: string
           updated_at?: string | null
           user_id?: string

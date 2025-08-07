@@ -18,6 +18,7 @@ export interface AnalysisData {
   graham_formula_2: number;
   bazin_formula: number;
   final_price: number;
+  notes: string;
   created_at: string;
   updated_at?: string;
   user_id?: string;

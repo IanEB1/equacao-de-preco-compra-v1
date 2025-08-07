@@ -117,6 +117,7 @@ const StockPriceCalculator = () => {
       graham_formula_2: results.proj,
       bazin_formula: results.bazin,
       final_price: results.finalPrice,
+      notes: '',
       folder_id: undefined
     };
 
