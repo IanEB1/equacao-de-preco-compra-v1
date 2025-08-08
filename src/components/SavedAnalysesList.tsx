@@ -294,7 +294,7 @@ const SavedAnalysesList = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">Análises Salvas</h1>
-              <p className="text-slate-400">Gerencie suas análises fundamentalistas</p>
+              <p className="text-slate-400">Gerencie as análises de suas ações</p>
             </div>
           </div>
 
@@ -531,14 +531,14 @@ const SavedAnalysesList = () => {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <span className="text-slate-400">LPA:</span>
-                          <span className="text-white ml-2">R$ {analysis.lpa.toFixed(2)}</span>
+                          <span className="text-white ml-2">{analysis.lpa.toFixed(2)}</span>
                         </div>
                         <div>
                           <span className="text-slate-400">VPA:</span>
-                          <span className="text-white ml-2">R$ {analysis.vpa.toFixed(2)}</span>
+                          <span className="text-white ml-2">{analysis.vpa.toFixed(2)}</span>
                         </div>
                         <div>
-                          <span className="text-slate-400">CAGR:</span>
+                          <span className="text-slate-400">CAGR Lucros 5 anos:</span>
                           <span className="text-white ml-2">{analysis.cagr.toFixed(1)}%</span>
                         </div>
                       </div>
