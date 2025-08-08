@@ -97,7 +97,7 @@ const calculatePrice = () => {
 
   const graham = Math.sqrt(10.5 * lpaUsed * vpaNum);
   const proj = lpaUsed * (7 + 2 * (cagrNum / 100));
-  const bazin = (d1Num + d2Num + d3Num + d4Num + d5Num) / 0.18;
+  const bazin = (d1Num + d2Num + d3Num + d4Num + d5Num) / 0.3;
   const finalPrice = (graham + proj * 1.5 + bazin * 0.5) / 3 * 0.8;
   setResults({
     graham,
@@ -417,7 +417,7 @@ const saveAnalysis = async () => {
                     </div>
                     <div className="flex justify-between">
                       <span>• Bazin:</span>
-                      <span>Soma Dividendos ÷ 0,18</span>
+                      <span>Soma Dividendos ÷ 0,3</span>
                     </div>
                     <div className="flex justify-between font-medium text-slate-200 pt-1 border-t border-slate-600">
                       <span>• Fórmula Final:</span>
