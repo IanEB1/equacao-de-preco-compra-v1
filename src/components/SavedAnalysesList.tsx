@@ -41,7 +41,14 @@ const SavedAnalysesList = () => {
   const filteredAnalyses = analyses.filter(analysis => {
     const matchesSearch = analysis.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (analysis.notes && analysis.notes.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesFolder = selectedFolder === null || analysis.folder_id === selectedFolder;
+    
+    let matchesFolder = true;
+    if (selectedFolder === "none") {
+      matchesFolder = !analysis.folder_id;
+    } else if (selectedFolder && selectedFolder !== "all") {
+      matchesFolder = analysis.folder_id === selectedFolder;
+    }
+    
     return matchesSearch && matchesFolder;
   });
 
@@ -303,13 +310,13 @@ const SavedAnalysesList = () => {
               />
             </div>
             
-            <Select value={selectedFolder || ""} onValueChange={(value) => setSelectedFolder(value || null)}>
+            <Select value={selectedFolder || "all"} onValueChange={(value) => setSelectedFolder(value === "all" ? null : value === "none" ? null : value)}>
               <SelectTrigger className="w-48 bg-slate-800/50 border-slate-600 text-white">
                 <SelectValue placeholder="Todas as pastas" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600">
-                <SelectItem value="">Todas as pastas</SelectItem>
-                <SelectItem value="null">Sem pasta</SelectItem>
+                <SelectItem value="all">Todas as pastas</SelectItem>
+                <SelectItem value="none">Sem pasta</SelectItem>
                 {folders.map(folder => (
                   <SelectItem key={folder.id} value={folder.id!}>
                     {folder.name}
@@ -349,7 +356,7 @@ const SavedAnalysesList = () => {
           </div>
 
           {/* Folder Management */}
-          {selectedFolder && selectedFolder !== "null" && (
+          {selectedFolder && selectedFolder !== "none" && selectedFolder !== "all" && (
             <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-600">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -385,7 +392,7 @@ const SavedAnalysesList = () => {
           )}
 
           {/* Export all for "Sem pasta" */}
-          {selectedFolder === "null" && (
+          {selectedFolder === "none" && (
             <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-600">
               <div className="flex items-center justify-between">
                 <span className="text-white font-medium">
@@ -559,15 +566,15 @@ const SavedAnalysesList = () => {
                   {/* Action Buttons */}
                   <div className="flex gap-2 pt-2 border-t border-slate-700">
                     <Select 
-                      value={analysis.folder_id || ""} 
-                      onValueChange={(value) => handleMoveAnalysis(analysis.id!, value || null)}
+                      value={analysis.folder_id || "no-folder"} 
+                      onValueChange={(value) => handleMoveAnalysis(analysis.id!, value === "no-folder" ? null : value)}
                     >
                       <SelectTrigger className="flex-1 bg-slate-900/50 border-slate-600 text-white text-xs h-8">
                         <ArrowUpDown className="h-3 w-3 mr-1" />
                         <SelectValue placeholder="Mover para..." />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-slate-600">
-                        <SelectItem value="">Sem pasta</SelectItem>
+                        <SelectItem value="no-folder">Sem pasta</SelectItem>
                         {folders.map(folder => (
                           <SelectItem key={folder.id} value={folder.id!}>
                             {folder.name}
