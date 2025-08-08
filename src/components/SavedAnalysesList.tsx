@@ -52,11 +52,11 @@ const SavedAnalysesList = () => {
     return matchesSearch && matchesFolder;
   });
 
-  const getFolderName = (folderId?: string) => {
-    if (!folderId) return "Sem pasta";
-    const folder = folders.find(f => f.id === folderId);
-    return folder ? folder.name : "Pasta desconhecida";
-  };
+const getFolderName = (folderId?: string | null) => {
+  if (!folderId) return "Sem pasta";
+  const folder = folders.find(f => f.id === folderId);
+  return folder ? folder.name : "Pasta desconhecida";
+};
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
@@ -191,8 +191,8 @@ const SavedAnalysesList = () => {
   };
 
   const exportFolderToPDF = async (folderId: string | null) => {
-    const folderAnalyses = analyses.filter(analysis => analysis.folder_id === folderId);
-    const folderName = getFolderName(folderId);
+  const folderAnalyses = analyses.filter(analysis => (folderId === null ? !analysis.folder_id : analysis.folder_id === folderId));
+  const folderName = getFolderName(folderId);
 
     if (folderAnalyses.length === 0) {
       toast({
@@ -244,19 +244,21 @@ const SavedAnalysesList = () => {
         pdf.text(`VPA: R$ ${analysis.vpa.toFixed(2)}`, 25, 170);
         pdf.text(`CAGR: ${analysis.cagr.toFixed(1)}%`, 25, 180);
         
-        pdf.text('Dividendos dos últimos 3 anos:', 25, 195);
+        pdf.text('Dividendos dos últimos 5 anos:', 25, 195);
         pdf.text(`Ano 1: R$ ${analysis.dividend_year_1.toFixed(2)}`, 30, 205);
         pdf.text(`Ano 2: R$ ${analysis.dividend_year_2.toFixed(2)}`, 30, 215);
         pdf.text(`Ano 3: R$ ${analysis.dividend_year_3.toFixed(2)}`, 30, 225);
+        pdf.text(`Ano 4: R$ ${analysis.dividend_year_4.toFixed(2)}`, 30, 235);
+        pdf.text(`Ano 5: R$ ${analysis.dividend_year_5.toFixed(2)}`, 30, 245);
 
         // Anotações
         if (analysis.notes && analysis.notes.trim()) {
           pdf.setFontSize(14);
-          pdf.text('Anotações:', 20, 245);
+          pdf.text('Anotações:', 20, 260);
           
           pdf.setFontSize(10);
           const splitNotes = pdf.splitTextToSize(analysis.notes, 170);
-          pdf.text(splitNotes, 25, 255);
+          pdf.text(splitNotes, 25, 270);
         }
       }
 
@@ -310,7 +312,7 @@ const SavedAnalysesList = () => {
               />
             </div>
             
-            <Select value={selectedFolder || "all"} onValueChange={(value) => setSelectedFolder(value === "all" ? null : value === "none" ? null : value)}>
+            <Select value={selectedFolder || "all"} onValueChange={(value) => setSelectedFolder(value)}>
               <SelectTrigger className="w-48 bg-slate-800/50 border-slate-600 text-white">
                 <SelectValue placeholder="Todas as pastas" />
               </SelectTrigger>
@@ -544,8 +546,8 @@ const SavedAnalysesList = () => {
                       </div>
                       
                       <div>
-                        <p className="text-slate-400 text-xs mb-2">Dividendos (3 anos):</p>
-                        <div className="grid grid-cols-3 gap-2 text-xs">
+                        <p className="text-slate-400 text-xs mb-2">Dividendos (5 anos):</p>
+                        <div className="grid grid-cols-5 gap-2 text-xs">
                           <div className="bg-slate-900/50 p-2 rounded text-center">
                             <p className="text-slate-400">Ano 1</p>
                             <p className="text-white">R$ {analysis.dividend_year_1.toFixed(2)}</p>
@@ -557,6 +559,14 @@ const SavedAnalysesList = () => {
                           <div className="bg-slate-900/50 p-2 rounded text-center">
                             <p className="text-slate-400">Ano 3</p>
                             <p className="text-white">R$ {analysis.dividend_year_3.toFixed(2)}</p>
+                          </div>
+                          <div className="bg-slate-900/50 p-2 rounded text-center">
+                            <p className="text-slate-400">Ano 4</p>
+                            <p className="text-white">R$ {analysis.dividend_year_4.toFixed(2)}</p>
+                          </div>
+                          <div className="bg-slate-900/50 p-2 rounded text-center">
+                            <p className="text-slate-400">Ano 5</p>
+                            <p className="text-white">R$ {analysis.dividend_year_5.toFixed(2)}</p>
                           </div>
                         </div>
                       </div>

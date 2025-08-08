@@ -78,6 +78,8 @@ export type Database = {
           dividend_year_1: number
           dividend_year_2: number
           dividend_year_3: number
+          dividend_year_4: number
+          dividend_year_5: number
           final_price: number
           folder_id: string | null
           graham_formula_1: number
@@ -97,6 +99,8 @@ export type Database = {
           dividend_year_1: number
           dividend_year_2: number
           dividend_year_3: number
+          dividend_year_4?: number
+          dividend_year_5?: number
           final_price: number
           folder_id?: string | null
           graham_formula_1: number
@@ -116,6 +120,8 @@ export type Database = {
           dividend_year_1?: number
           dividend_year_2?: number
           dividend_year_3?: number
+          dividend_year_4?: number
+          dividend_year_5?: number
           final_price?: number
           folder_id?: string | null
           graham_formula_1?: number

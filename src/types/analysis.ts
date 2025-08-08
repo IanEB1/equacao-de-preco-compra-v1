@@ -14,6 +14,8 @@ export interface AnalysisData {
   dividend_year_1: number;
   dividend_year_2: number;
   dividend_year_3: number;
+  dividend_year_4: number;
+  dividend_year_5: number;
   graham_formula_1: number;
   graham_formula_2: number;
   bazin_formula: number;

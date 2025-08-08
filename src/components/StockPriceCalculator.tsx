@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AnalysisData } from "@/types/analysis";
 import { useAnalyses } from "@/hooks/useAnalyses";
 import { Calculator, TrendingUp, DollarSign } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CalculationResults {
   graham: number;
@@ -25,117 +26,196 @@ const StockPriceCalculator = () => {
   const validateTicker = (value: string) => {
     return value.replace(/[^A-Za-z0-9]/g, '').slice(0, 10);
   };
+  const [lpaMode, setLpaMode] = useState<"current" | "avg5">("current");
   const [lpa, setLpa] = useState("");
+  const [profit1, setProfit1] = useState("");
+  const [profit2, setProfit2] = useState("");
+  const [profit3, setProfit3] = useState("");
+  const [profit4, setProfit4] = useState("");
+  const [profit5, setProfit5] = useState("");
+  const [shares, setShares] = useState("");
   const [vpa, setVpa] = useState("");
   const [cagr, setCagr] = useState("");
   const [d1, setD1] = useState("");
   const [d2, setD2] = useState("");
   const [d3, setD3] = useState("");
+  const [d4, setD4] = useState("");
+  const [d5, setD5] = useState("");
   const [results, setResults] = useState<CalculationResults | null>(null);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const { saveAnalysis: saveToDatabase } = useAnalyses();
+const calculatePrice = () => {
+  const vpaNum = parseFloat(vpa);
+  const cagrNum = parseFloat(cagr);
 
-  const calculatePrice = () => {
+  const d1Num = parseFloat(d1);
+  const d2Num = parseFloat(d2);
+  const d3Num = parseFloat(d3);
+  const d4Num = parseFloat(d4);
+  const d5Num = parseFloat(d5);
+
+  let lpaUsed = 0;
+  if (lpaMode === 'current') {
     const lpaNum = parseFloat(lpa);
-    const vpaNum = parseFloat(vpa);
-    const cagrNum = parseFloat(cagr);
-    const d1Num = parseFloat(d1);
-    const d2Num = parseFloat(d2);
-    const d3Num = parseFloat(d3);
-    
-    // Check if all required fields are filled (all except ticker)
-    if (!lpaNum || !vpaNum || !cagrNum || !d1Num || !d2Num || !d3Num) {
+    if (!lpaNum) {
       toast({
         title: "Dados obrigatórios",
-        description: "Por favor, preencha todos os campos obrigatórios para gerar a análise.",
+        description: "Informe o LPA para gerar a análise.",
         variant: "destructive"
       });
       return;
     }
-
-    // Cálculos das fórmulas originais
-    const graham = Math.sqrt(10.5 * lpaNum * vpaNum);
-    const proj = lpaNum * (7 + 2 * (cagrNum / 100));
-    const bazin = (d1Num + d2Num + d3Num) / 0.18;
-    const finalPrice = (graham + proj * 1.5 + bazin * 0.5) / 3 * 0.8;
-    setResults({
-      graham,
-      proj,
-      bazin,
-      finalPrice
-    });
-  };
-
-  const clearData = () => {
-    setTicker("");
-    setLpa("");
-    setVpa("");
-    setCagr("");
-    setD1("");
-    setD2("");
-    setD3("");
-    setResults(null);
-  };
-
-  const saveAnalysis = async () => {
-    if (!results || !ticker.trim()) {
+    lpaUsed = lpaNum;
+  } else {
+    const p1 = parseFloat(profit1);
+    const p2 = parseFloat(profit2);
+    const p3 = parseFloat(profit3);
+    const p4 = parseFloat(profit4);
+    const p5 = parseFloat(profit5);
+    const sh = parseFloat(shares);
+    if (!p1 || !p2 || !p3 || !p4 || !p5 || !sh) {
       toast({
-        title: "Análise não encontrada",
-        description: "Gere uma análise antes de salvar.",
+        title: "Dados obrigatórios",
+        description: "Informe os 5 lucros líquidos e o número de ações.",
         variant: "destructive"
       });
       return;
     }
+    lpaUsed = ((p1 + p2 + p3 + p4 + p5) / 5) / sh;
+  }
 
-    // Validate that all required fields are filled
+  if (!vpaNum || !cagrNum || !d1Num || !d2Num || !d3Num || !d4Num || !d5Num) {
+    toast({
+      title: "Dados obrigatórios",
+      description: "Preencha VPA, CAGR e os 5 dividendos.",
+      variant: "destructive"
+    });
+    return;
+  }
+
+  const graham = Math.sqrt(10.5 * lpaUsed * vpaNum);
+  const proj = lpaUsed * (7 + 2 * (cagrNum / 100));
+  const bazin = (d1Num + d2Num + d3Num + d4Num + d5Num) / 0.18;
+  const finalPrice = (graham + proj * 1.5 + bazin * 0.5) / 3 * 0.8;
+  setResults({
+    graham,
+    proj,
+    bazin,
+    finalPrice
+  });
+};
+
+const clearData = () => {
+  setTicker("");
+  setLpaMode("current");
+  setLpa("");
+  setProfit1("");
+  setProfit2("");
+  setProfit3("");
+  setProfit4("");
+  setProfit5("");
+  setShares("");
+  setVpa("");
+  setCagr("");
+  setD1("");
+  setD2("");
+  setD3("");
+  setD4("");
+  setD5("");
+  setResults(null);
+};
+
+const saveAnalysis = async () => {
+  if (!results || !ticker.trim()) {
+    toast({
+      title: "Análise não encontrada",
+      description: "Gere uma análise antes de salvar.",
+      variant: "destructive"
+    });
+    return;
+  }
+
+  const vpaNum = parseFloat(vpa);
+  const d1Num = parseFloat(d1);
+  const d2Num = parseFloat(d2);
+  const d3Num = parseFloat(d3);
+  const d4Num = parseFloat(d4);
+  const d5Num = parseFloat(d5);
+
+  let lpaUsed = 0;
+  if (lpaMode === 'current') {
     const lpaNum = parseFloat(lpa);
-    const vpaNum = parseFloat(vpa);
-    const d1Num = parseFloat(d1);
-    const d2Num = parseFloat(d2);
-    const d3Num = parseFloat(d3);
-
-    if (!lpaNum || !vpaNum || !d1Num || !d2Num || !d3Num) {
+    if (!lpaNum) {
       toast({
         title: "Dados incompletos",
-        description: "Todos os campos obrigatórios devem estar preenchidos para salvar.",
+        description: "Informe o LPA para salvar.",
         variant: "destructive"
       });
       return;
     }
-
-    const analysisData = {
-      ticker: ticker.toUpperCase(),
-      lpa: lpaNum,
-      vpa: vpaNum,
-      cagr: parseFloat(cagr) || 0,
-      dividend_year_1: d1Num,
-      dividend_year_2: d2Num,
-      dividend_year_3: d3Num,
-      graham_formula_1: results.graham,
-      graham_formula_2: results.proj,
-      bazin_formula: results.bazin,
-      final_price: results.finalPrice,
-      notes: '',
-      folder_id: undefined
-    };
-
-    try {
-      await saveToDatabase(analysisData);
+    lpaUsed = lpaNum;
+  } else {
+    const p1 = parseFloat(profit1);
+    const p2 = parseFloat(profit2);
+    const p3 = parseFloat(profit3);
+    const p4 = parseFloat(profit4);
+    const p5 = parseFloat(profit5);
+    const sh = parseFloat(shares);
+    if (!p1 || !p2 || !p3 || !p4 || !p5 || !sh) {
       toast({
-        title: "Análise salva com sucesso!",
-        description: `A análise de ${ticker.toUpperCase()} foi salva.`
-      });
-    } catch (error) {
-      console.error('Erro ao salvar análise:', error);
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar a análise. Tente novamente.",
+        title: "Dados incompletos",
+        description: "Informe os 5 lucros líquidos e o número de ações.",
         variant: "destructive"
       });
+      return;
     }
-  };
+    lpaUsed = ((p1 + p2 + p3 + p4 + p5) / 5) / sh;
+  }
+
+  if (!vpaNum || !d1Num || !d2Num || !d3Num || !d4Num || !d5Num) {
+    toast({
+      title: "Dados incompletos",
+      description: "Preencha VPA e os 5 dividendos para salvar.",
+      variant: "destructive"
+    });
+    return;
+  }
+
+  const analysisData = {
+    ticker: ticker.toUpperCase(),
+    lpa: lpaUsed,
+    vpa: vpaNum,
+    cagr: parseFloat(cagr) || 0,
+    dividend_year_1: d1Num,
+    dividend_year_2: d2Num,
+    dividend_year_3: d3Num,
+    dividend_year_4: d4Num,
+    dividend_year_5: d5Num,
+    graham_formula_1: results.graham,
+    graham_formula_2: results.proj,
+    bazin_formula: results.bazin,
+    final_price: results.finalPrice,
+    notes: '',
+    folder_id: undefined
+  } as Omit<AnalysisData, 'id' | 'created_at' | 'user_id'>;
+
+  try {
+    await saveToDatabase(analysisData);
+    toast({
+      title: "Análise salva com sucesso!",
+      description: `A análise de ${ticker.toUpperCase()} foi salva.`
+    });
+  } catch (error) {
+    console.error('Erro ao salvar análise:', error);
+    toast({
+      title: "Erro ao salvar",
+      description: "Ocorreu um erro ao salvar a análise. Tente novamente.",
+      variant: "destructive"
+    });
+  }
+};
 
   return <div className="min-h-screen bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] px-4 py-8">
       {/* Header com botão voltar */}
@@ -181,13 +261,43 @@ const StockPriceCalculator = () => {
               <Input id="ticker" type="text" placeholder="Ex: PETR4" value={ticker} onChange={e => setTicker(validateTicker(e.target.value.toUpperCase()))} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" maxLength={10} />
             </div>
 
-            {/* LPA */}
-            <div className="space-y-2">
-              <Label htmlFor="lpa" className="text-white font-medium">
-                LPA (Lucro por Ação)
-              </Label>
-              <Input id="lpa" type="number" step="0.01" placeholder="Ex: 2.50" value={lpa} onChange={e => setLpa(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" />
-            </div>
+{/* LPA - Fonte e valores */}
+<div className="space-y-2">
+  <Label className="text-white font-medium">Fonte do LPA</Label>
+  <Select value={lpaMode} onValueChange={(v) => setLpaMode(v as "current" | "avg5")}>
+    <SelectTrigger className="bg-slate-900/50 border-slate-600 text-white">
+      <SelectValue placeholder="Selecione a fonte do LPA" />
+    </SelectTrigger>
+    <SelectContent className="bg-slate-800 border-slate-600">
+      <SelectItem value="current">LPA atual</SelectItem>
+      <SelectItem value="avg5">LPA médio 5 anos</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+
+{lpaMode === 'current' ? (
+  <div className="space-y-2">
+    <Label htmlFor="lpa" className="text-white font-medium">
+      LPA (Lucro por Ação)
+    </Label>
+    <Input id="lpa" type="number" step="0.01" placeholder="Ex: 2.50" value={lpa} onChange={e => setLpa(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" />
+  </div>
+) : (
+  <div className="space-y-2">
+    <Label className="text-white font-medium">LPA médio 5 anos</Label>
+    <div className="grid grid-cols-5 gap-3">
+      <Input type="number" step="0.01" placeholder="Lucro ano 1" value={profit1} onChange={e => setProfit1(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+      <Input type="number" step="0.01" placeholder="Lucro ano 2" value={profit2} onChange={e => setProfit2(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+      <Input type="number" step="0.01" placeholder="Lucro ano 3" value={profit3} onChange={e => setProfit3(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+      <Input type="number" step="0.01" placeholder="Lucro ano 4" value={profit4} onChange={e => setProfit4(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+      <Input type="number" step="0.01" placeholder="Lucro ano 5" value={profit5} onChange={e => setProfit5(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+    </div>
+    <div>
+      <Label htmlFor="shares" className="text-white font-medium">Número de ações (atual)</Label>
+      <Input id="shares" type="number" step="1" placeholder="Ex: 100000000" value={shares} onChange={e => setShares(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" />
+    </div>
+  </div>
+)}
 
             {/* VPA */}
             <div className="space-y-2">
@@ -208,18 +318,20 @@ const StockPriceCalculator = () => {
             {/* Dividendos */}
             <div className="space-y-2">
               <Label className="text-white font-medium">
-                Dividendos dos últimos 3 anos (R$)
+                Dividendos dos últimos 5 anos (R$)
               </Label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-5 gap-3">
                 <Input type="number" step="0.01" placeholder="Ano 1" value={d1} onChange={e => setD1(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
                 <Input type="number" step="0.01" placeholder="Ano 2" value={d2} onChange={e => setD2(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
                 <Input type="number" step="0.01" placeholder="Ano 3" value={d3} onChange={e => setD3(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+                <Input type="number" step="0.01" placeholder="Ano 4" value={d4} onChange={e => setD4(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
+                <Input type="number" step="0.01" placeholder="Ano 5" value={d5} onChange={e => setD5(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
               </div>
             </div>
 
             {/* Botões */}
             <div className="flex gap-3 pt-4">
-              <Button onClick={calculatePrice} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" disabled={!lpa || !vpa || !cagr || !d1 || !d2 || !d3}>
+              <Button onClick={calculatePrice} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" disabled={!vpa || !cagr || !d1 || !d2 || !d3 || !d4 || !d5 || (lpaMode === 'current' ? !lpa : (!profit1 || !profit2 || !profit3 || !profit4 || !profit5 || !shares))}>
                 <Calculator className="h-4 w-4" />
                 Gerar Análise
               </Button>
@@ -285,7 +397,7 @@ const StockPriceCalculator = () => {
                 {isAuthenticated && <Button 
                     onClick={saveAnalysis} 
                     className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
-                    disabled={!results || !ticker || !lpa || !vpa || !d1 || !d2 || !d3}
+                    disabled={!results || !ticker || !vpa || !d1 || !d2 || !d3 || !d4 || !d5 || (lpaMode === 'current' ? !lpa : (!profit1 || !profit2 || !profit3 || !profit4 || !profit5 || !shares))}
                   >
                     <Save className="h-4 w-4" />
                     Salvar Análise
