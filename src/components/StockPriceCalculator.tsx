@@ -364,7 +364,7 @@ const saveAnalysis = async () => {
               <Label className="text-white font-medium">CAGR Lucros 5 anos</Label>
               <div className="space-y-2">
                 <Label htmlFor="currentProfit" className="text-white text-sm">
-                  Lucro Atual (R$)
+                  Lucro Atual
                 </Label>
                 <Input 
                   id="currentProfit" 
@@ -378,7 +378,7 @@ const saveAnalysis = async () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="profit5YearsAgo" className="text-white text-sm">
-                  Lucro de 5 anos atrás (R$)
+                  Lucro de 5 anos atrás (trazido a valor presente)
                 </Label>
                 <Input 
                   id="profit5YearsAgo" 
