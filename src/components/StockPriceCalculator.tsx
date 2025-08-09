@@ -303,7 +303,7 @@ const saveAnalysis = async () => {
   </div>
 ) : (
   <div className="space-y-2">
-    <Label className="text-white font-medium">LPA médio 5 anos</Label>
+    <Label className="text-white font-medium">LPA médio 5 anos (Lucros trazidos a valor presente</Label>
     <div className="grid grid-cols-5 gap-3">
       <Input type="number" step="0.01" placeholder="Lucro ano 1" value={profit1} onChange={e => setProfit1(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
       <Input type="number" step="0.01" placeholder="Lucro ano 2" value={profit2} onChange={e => setProfit2(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center" />
