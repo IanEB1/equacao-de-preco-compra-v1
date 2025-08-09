@@ -35,7 +35,8 @@ const StockPriceCalculator = () => {
   const [profit5, setProfit5] = useState("");
   const [shares, setShares] = useState("");
   const [vpa, setVpa] = useState("");
-  const [cagr, setCagr] = useState("");
+  const [currentProfit, setCurrentProfit] = useState("");
+  const [profit5YearsAgo, setProfit5YearsAgo] = useState("");
   const [d1, setD1] = useState("");
   const [d2, setD2] = useState("");
   const [d3, setD3] = useState("");
@@ -48,7 +49,14 @@ const StockPriceCalculator = () => {
   const { saveAnalysis: saveToDatabase } = useAnalyses();
 const calculatePrice = () => {
   const vpaNum = parseFloat(vpa);
-  const cagrNum = parseFloat(cagr);
+  const currentProfitNum = parseFloat(currentProfit);
+  const profit5YearsAgoNum = parseFloat(profit5YearsAgo);
+
+  // Calcular CAGR internamente
+  let calculatedCagr = 0;
+  if (!isNaN(currentProfitNum) && !isNaN(profit5YearsAgoNum) && profit5YearsAgoNum !== 0) {
+    calculatedCagr = (Math.pow(currentProfitNum / profit5YearsAgoNum, 0.2) - 1) * 100;
+  }
 
   const d1Num = parseFloat(d1);
   const d2Num = parseFloat(d2);
@@ -98,20 +106,32 @@ const calculatePrice = () => {
     lpaUsed = ((p1 + p2 + p3 + p4 + p5) / 5) / sh;
   }
 
-  if (isNaN(vpaNum) || vpa.trim() === '' || isNaN(cagrNum) || cagr.trim() === '' || 
+  // Validações específicas para os novos campos de lucro
+  if (profit5YearsAgoNum <= 0) {
+    toast({
+      title: "Valores inválidos",
+      description: "Lucro de 5 anos atrás deve ser maior que zero.",
+      variant: "destructive"
+    });
+    return;
+  }
+
+  if (isNaN(vpaNum) || vpa.trim() === '' || 
+      isNaN(currentProfitNum) || currentProfit.trim() === '' || 
+      isNaN(profit5YearsAgoNum) || profit5YearsAgo.trim() === '' ||
       isNaN(d1Num) || d1.trim() === '' || isNaN(d2Num) || d2.trim() === '' || 
       isNaN(d3Num) || d3.trim() === '' || isNaN(d4Num) || d4.trim() === '' || 
       isNaN(d5Num) || d5.trim() === '') {
     toast({
       title: "Dados obrigatórios",
-      description: "Preencha VPA, CAGR e os 5 dividendos.",
+      description: "Preencha VPA, lucros e os 5 dividendos.",
       variant: "destructive"
     });
     return;
   }
 
   const graham = Math.sqrt(10.5 * lpaUsed * vpaNum);
-  const proj = lpaUsed * (7 + 2 * (cagrNum / 100));
+  const proj = lpaUsed * (7 + 2 * (calculatedCagr / 100));
   const bazin = (d1Num + d2Num + d3Num + d4Num + d5Num) / 0.3;
   const finalPrice = (graham + proj * 1.5 + bazin * 0.5) / 3 * 0.8;
   setResults({
@@ -133,7 +153,8 @@ const clearData = () => {
   setProfit5("");
   setShares("");
   setVpa("");
-  setCagr("");
+  setCurrentProfit("");
+  setProfit5YearsAgo("");
   setD1("");
   setD2("");
   setD3("");
@@ -191,12 +212,24 @@ const saveAnalysis = async () => {
     lpaUsed = ((p1 + p2 + p3 + p4 + p5) / 5) / sh;
   }
 
-  if (isNaN(vpaNum) || vpa.trim() === '' || isNaN(d1Num) || d1.trim() === '' || 
+  const currentProfitNum = parseFloat(currentProfit);
+  const profit5YearsAgoNum = parseFloat(profit5YearsAgo);
+
+  // Calcular CAGR para salvar
+  let calculatedCagr = 0;
+  if (!isNaN(currentProfitNum) && !isNaN(profit5YearsAgoNum) && profit5YearsAgoNum > 0) {
+    calculatedCagr = (Math.pow(currentProfitNum / profit5YearsAgoNum, 0.2) - 1) * 100;
+  }
+
+  if (isNaN(vpaNum) || vpa.trim() === '' ||
+      isNaN(currentProfitNum) || currentProfit.trim() === '' ||
+      isNaN(profit5YearsAgoNum) || profit5YearsAgo.trim() === '' ||
+      isNaN(d1Num) || d1.trim() === '' || 
       isNaN(d2Num) || d2.trim() === '' || isNaN(d3Num) || d3.trim() === '' || 
       isNaN(d4Num) || d4.trim() === '' || isNaN(d5Num) || d5.trim() === '') {
     toast({
       title: "Dados incompletos",
-      description: "Preencha VPA e os 5 dividendos para salvar.",
+      description: "Preencha VPA, lucros e os 5 dividendos para salvar.",
       variant: "destructive"
     });
     return;
@@ -206,7 +239,7 @@ const saveAnalysis = async () => {
     ticker: ticker.toUpperCase(),
     lpa: lpaUsed,
     vpa: vpaNum,
-    cagr: parseFloat(cagr) || 0,
+    cagr: calculatedCagr,
     dividend_year_1: d1Num,
     dividend_year_2: d2Num,
     dividend_year_3: d3Num,
@@ -326,12 +359,37 @@ const saveAnalysis = async () => {
               <Input id="vpa" type="number" step="0.01" placeholder="Ex: 12.30" value={vpa} onChange={e => setVpa(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" />
             </div>
 
-            {/* CAGR */}
-            <div className="space-y-2">
-              <Label htmlFor="cagr" className="text-white font-medium">
-                CAGR Lucros 5 anos (%)
-              </Label>
-              <Input id="cagr" type="number" step="0.1" placeholder="Ex: 15.5" value={cagr} onChange={e => setCagr(e.target.value)} className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" />
+            {/* Campos para cálculo do CAGR */}
+            <div className="space-y-4">
+              <Label className="text-white font-medium">CAGR Lucros 5 anos</Label>
+              <div className="space-y-2">
+                <Label htmlFor="currentProfit" className="text-white text-sm">
+                  Lucro Atual (R$)
+                </Label>
+                <Input 
+                  id="currentProfit" 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="Ex: 1000000000" 
+                  value={currentProfit} 
+                  onChange={e => setCurrentProfit(e.target.value)} 
+                  className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profit5YearsAgo" className="text-white text-sm">
+                  Lucro de 5 anos atrás (R$)
+                </Label>
+                <Input 
+                  id="profit5YearsAgo" 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="Ex: 500000000" 
+                  value={profit5YearsAgo} 
+                  onChange={e => setProfit5YearsAgo(e.target.value)} 
+                  className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500" 
+                />
+              </div>
             </div>
 
             {/* Dividendos */}
@@ -350,7 +408,7 @@ const saveAnalysis = async () => {
 
             {/* Botões */}
             <div className="flex gap-3 pt-4">
-              <Button onClick={calculatePrice} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" disabled={vpa.trim() === '' || cagr.trim() === '' || d1.trim() === '' || d2.trim() === '' || d3.trim() === '' || d4.trim() === '' || d5.trim() === '' || (lpaMode === 'current' ? lpa.trim() === '' : (profit1.trim() === '' || profit2.trim() === '' || profit3.trim() === '' || profit4.trim() === '' || profit5.trim() === '' || shares.trim() === ''))}>
+              <Button onClick={calculatePrice} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" disabled={vpa.trim() === '' || currentProfit.trim() === '' || profit5YearsAgo.trim() === '' || d1.trim() === '' || d2.trim() === '' || d3.trim() === '' || d4.trim() === '' || d5.trim() === '' || (lpaMode === 'current' ? lpa.trim() === '' : (profit1.trim() === '' || profit2.trim() === '' || profit3.trim() === '' || profit4.trim() === '' || profit5.trim() === '' || shares.trim() === ''))}>
                 <Calculator className="h-4 w-4" />
                 Gerar Análise
               </Button>

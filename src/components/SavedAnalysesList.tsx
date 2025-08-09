@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAnalyses } from "@/hooks/useAnalyses";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Search, 
   Plus, 
@@ -512,9 +513,11 @@ const getFolderName = (folderId?: string | null) => {
                         </div>
                       </div>
                     ) : (
-                      <div className="bg-slate-900/30 p-2 rounded text-xs text-slate-300 min-h-[60px]">
-                        {analysis.notes || "Nenhuma anotação"}
-                      </div>
+                      <ScrollArea className="bg-slate-900/30 p-2 rounded text-xs text-slate-300 min-h-[60px] max-h-[120px]">
+                        <div className="whitespace-pre-wrap">
+                          {analysis.notes || "Nenhuma anotação"}
+                        </div>
+                      </ScrollArea>
                     )}
                   </div>
 
