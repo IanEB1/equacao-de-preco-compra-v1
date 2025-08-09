@@ -56,10 +56,20 @@ const calculatePrice = () => {
   const d4Num = parseFloat(d4);
   const d5Num = parseFloat(d5);
 
+  // Validar dividendos negativos
+  if (d1Num < 0 || d2Num < 0 || d3Num < 0 || d4Num < 0 || d5Num < 0) {
+    toast({
+      title: "Valores inválidos",
+      description: "Dividendos não podem ser negativos.",
+      variant: "destructive"
+    });
+    return;
+  }
+
   let lpaUsed = 0;
   if (lpaMode === 'current') {
     const lpaNum = parseFloat(lpa);
-    if (!lpaNum) {
+    if (isNaN(lpaNum) || lpa.trim() === '') {
       toast({
         title: "Dados obrigatórios",
         description: "Informe o LPA para gerar a análise.",
@@ -75,7 +85,9 @@ const calculatePrice = () => {
     const p4 = parseFloat(profit4);
     const p5 = parseFloat(profit5);
     const sh = parseFloat(shares);
-    if (!p1 || !p2 || !p3 || !p4 || !p5 || !sh) {
+    if (isNaN(p1) || profit1.trim() === '' || isNaN(p2) || profit2.trim() === '' || 
+        isNaN(p3) || profit3.trim() === '' || isNaN(p4) || profit4.trim() === '' || 
+        isNaN(p5) || profit5.trim() === '' || isNaN(sh) || shares.trim() === '') {
       toast({
         title: "Dados obrigatórios",
         description: "Informe os 5 lucros líquidos e o número de ações.",
@@ -86,7 +98,10 @@ const calculatePrice = () => {
     lpaUsed = ((p1 + p2 + p3 + p4 + p5) / 5) / sh;
   }
 
-  if (!vpaNum || !cagrNum || !d1Num || !d2Num || !d3Num || !d4Num || !d5Num) {
+  if (isNaN(vpaNum) || vpa.trim() === '' || isNaN(cagrNum) || cagr.trim() === '' || 
+      isNaN(d1Num) || d1.trim() === '' || isNaN(d2Num) || d2.trim() === '' || 
+      isNaN(d3Num) || d3.trim() === '' || isNaN(d4Num) || d4.trim() === '' || 
+      isNaN(d5Num) || d5.trim() === '') {
     toast({
       title: "Dados obrigatórios",
       description: "Preencha VPA, CAGR e os 5 dividendos.",
@@ -147,7 +162,7 @@ const saveAnalysis = async () => {
   let lpaUsed = 0;
   if (lpaMode === 'current') {
     const lpaNum = parseFloat(lpa);
-    if (!lpaNum) {
+    if (isNaN(lpaNum) || lpa.trim() === '') {
       toast({
         title: "Dados incompletos",
         description: "Informe o LPA para salvar.",
@@ -163,7 +178,9 @@ const saveAnalysis = async () => {
     const p4 = parseFloat(profit4);
     const p5 = parseFloat(profit5);
     const sh = parseFloat(shares);
-    if (!p1 || !p2 || !p3 || !p4 || !p5 || !sh) {
+    if (isNaN(p1) || profit1.trim() === '' || isNaN(p2) || profit2.trim() === '' || 
+        isNaN(p3) || profit3.trim() === '' || isNaN(p4) || profit4.trim() === '' || 
+        isNaN(p5) || profit5.trim() === '' || isNaN(sh) || shares.trim() === '') {
       toast({
         title: "Dados incompletos",
         description: "Informe os 5 lucros líquidos e o número de ações.",
@@ -174,7 +191,9 @@ const saveAnalysis = async () => {
     lpaUsed = ((p1 + p2 + p3 + p4 + p5) / 5) / sh;
   }
 
-  if (!vpaNum || !d1Num || !d2Num || !d3Num || !d4Num || !d5Num) {
+  if (isNaN(vpaNum) || vpa.trim() === '' || isNaN(d1Num) || d1.trim() === '' || 
+      isNaN(d2Num) || d2.trim() === '' || isNaN(d3Num) || d3.trim() === '' || 
+      isNaN(d4Num) || d4.trim() === '' || isNaN(d5Num) || d5.trim() === '') {
     toast({
       title: "Dados incompletos",
       description: "Preencha VPA e os 5 dividendos para salvar.",
@@ -331,7 +350,7 @@ const saveAnalysis = async () => {
 
             {/* Botões */}
             <div className="flex gap-3 pt-4">
-              <Button onClick={calculatePrice} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" disabled={!vpa || !cagr || !d1 || !d2 || !d3 || !d4 || !d5 || (lpaMode === 'current' ? !lpa : (!profit1 || !profit2 || !profit3 || !profit4 || !profit5 || !shares))}>
+              <Button onClick={calculatePrice} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" disabled={vpa.trim() === '' || cagr.trim() === '' || d1.trim() === '' || d2.trim() === '' || d3.trim() === '' || d4.trim() === '' || d5.trim() === '' || (lpaMode === 'current' ? lpa.trim() === '' : (profit1.trim() === '' || profit2.trim() === '' || profit3.trim() === '' || profit4.trim() === '' || profit5.trim() === '' || shares.trim() === ''))}>
                 <Calculator className="h-4 w-4" />
                 Gerar Análise
               </Button>
@@ -397,7 +416,7 @@ const saveAnalysis = async () => {
                 {isAuthenticated && <Button 
                     onClick={saveAnalysis} 
                     className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
-                    disabled={!results || !ticker || !vpa || !d1 || !d2 || !d3 || !d4 || !d5 || (lpaMode === 'current' ? !lpa : (!profit1 || !profit2 || !profit3 || !profit4 || !profit5 || !shares))}
+                    disabled={!results || ticker.trim() === '' || vpa.trim() === '' || d1.trim() === '' || d2.trim() === '' || d3.trim() === '' || d4.trim() === '' || d5.trim() === '' || (lpaMode === 'current' ? lpa.trim() === '' : (profit1.trim() === '' || profit2.trim() === '' || profit3.trim() === '' || profit4.trim() === '' || profit5.trim() === '' || shares.trim() === ''))}
                   >
                     <Save className="h-4 w-4" />
                     Salvar Análise
