@@ -241,8 +241,8 @@ const getFolderName = (folderId?: string | null) => {
         pdf.text('Dados Fundamentalistas:', 20, 145);
         
         pdf.setFontSize(11);
-        pdf.text(`LPA: R$ ${analysis.lpa.toFixed(2)}`, 25, 160);
-        pdf.text(`VPA: R$ ${analysis.vpa.toFixed(2)}`, 25, 170);
+        pdf.text(`LPA: ${analysis.lpa.toFixed(2)}`, 25, 160);
+        pdf.text(`VPA: ${analysis.vpa.toFixed(2)}`, 25, 170);
         pdf.text(`CAGR: ${analysis.cagr.toFixed(1)}%`, 25, 180);
         
         pdf.text('Dividendos dos últimos 5 anos:', 25, 195);
@@ -257,7 +257,7 @@ const getFolderName = (folderId?: string | null) => {
           pdf.setFontSize(14);
           pdf.text('Anotações:', 20, 260);
           
-          pdf.setFontSize(10);
+          pdf.setFontSize(11);
           const splitNotes = pdf.splitTextToSize(analysis.notes, 170);
           pdf.text(splitNotes, 25, 270);
         }
