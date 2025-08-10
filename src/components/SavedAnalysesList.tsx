@@ -222,7 +222,11 @@ const getFolderName = (folderId?: string | null) => {
         pdf.text(`Pasta: ${folderName}`, 20, 45);
         pdf.text(`Data: ${formatDate(analysis.created_at)}`, 20, 55);
 
-        // Dados sempre visíveis
+        // Linha central separadora
+        pdf.setLineWidth(0.5);
+        pdf.line(105, 70, 105, 280);
+
+        // COLUNA ESQUERDA - Análise
         pdf.setFontSize(14);
         pdf.text('Preços Calculados:', 20, 75);
         
@@ -252,14 +256,14 @@ const getFolderName = (folderId?: string | null) => {
         pdf.text(`Ano 4: R$ ${analysis.dividend_year_4.toFixed(2)}`, 30, 235);
         pdf.text(`Ano 5: R$ ${analysis.dividend_year_5.toFixed(2)}`, 30, 245);
 
-        // Anotações
+        // COLUNA DIREITA - Anotações
         if (analysis.notes && analysis.notes.trim()) {
           pdf.setFontSize(14);
-          pdf.text('Anotações:', 20, 260);
+          pdf.text('Anotações:', 110, 75);
           
           pdf.setFontSize(11);
-          const splitNotes = pdf.splitTextToSize(analysis.notes, 170);
-          pdf.text(splitNotes, 25, 270);
+          const splitNotes = pdf.splitTextToSize(analysis.notes, 85);
+          pdf.text(splitNotes, 110, 90);
         }
       }
 
@@ -513,11 +517,13 @@ const getFolderName = (folderId?: string | null) => {
                         </div>
                       </div>
                     ) : (
-                      <ScrollArea className="bg-slate-900/30 p-2 rounded text-xs text-slate-300 min-h-[60px] max-h-[120px]">
-                        <div className="whitespace-pre-wrap">
-                          {analysis.notes || "Nenhuma anotação"}
-                        </div>
-                      </ScrollArea>
+                      <div className="bg-slate-900/30 p-2 rounded text-xs text-slate-300 min-h-[60px] max-h-[120px] border border-slate-700">
+                        <ScrollArea className="h-full max-h-[104px]">
+                          <div className="whitespace-pre-wrap pr-2">
+                            {analysis.notes || "Nenhuma anotação"}
+                          </div>
+                        </ScrollArea>
+                      </div>
                     )}
                   </div>
 
